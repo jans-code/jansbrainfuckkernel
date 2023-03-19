@@ -12,7 +12,7 @@ A jupyter kernel implementation of [brainfuck](https://github.com/benjamin-james
 - open shell in project folder
 - `pip install -e ./`
 - then install kernelspec
-- `jansbrainkernel`
+- `jansbrainfuckkernel`
 - or
 - `jupyter kernelspec install --user jansbrainfuckkernel`
 
