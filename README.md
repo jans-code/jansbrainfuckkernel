@@ -7,7 +7,7 @@ A jupyter kernel implementation of [brainfuck](https://github.com/benjamin-james
 
 ## Dev Installation
 
-- install brainfuck from the AUR
+- install brainfuck (make sure you can run bfc from command line)
 - download/clone this project
 - open shell in project folder
 - `pip install -e ./`

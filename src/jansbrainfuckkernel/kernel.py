@@ -4,7 +4,7 @@ import pexpect, os, shutil
 
 class jansbrainfuckkernel(Kernel):
     implementation = 'IPython'
-    implementation_version = '8.10.0'
+    implementation_version = '8.11.0'
     language = 'brainfuck'
     language_version = '0.1'
     language_info = {
@@ -18,13 +18,17 @@ class jansbrainfuckkernel(Kernel):
                    allow_stdin=False):
         if not silent:            
             workingdir = "/tmp/jansbrainfuckkernel/"
+            if os.path.exists(workingdir):
+                shutil.rmtree(workingdir)
             os.mkdir(workingdir)
             os.chdir(workingdir)
             with open(workingdir + "proj.bf", "w") as f:
                     f.write(code)
             os.system('bfc ' + workingdir  + 'proj.bf')
-            solution = pexpect.run(workingdir + 'a.out').decode('ascii')
-            shutil.rmtree(workingdir)
+            if os.path.exists(workingdir + 'a.out'):
+                solution = pexpect.run(workingdir + 'a.out').decode('utf-8')
+            else:
+                solution = "Fuck your brain code did not compile."
             stream_content = {'name': 'stdout', 'text': solution}
             self.send_response(self.iopub_socket, 'stream', stream_content)
 
@@ -33,3 +37,7 @@ class jansbrainfuckkernel(Kernel):
                 'payload': [],
                 'user_expressions': {},
                }
+    
+    def do_shutdown(self, restart):
+        workingdir = "/tmp/jansbrainfuckkernel/"
+        shutil.rmtree(workingdir)
