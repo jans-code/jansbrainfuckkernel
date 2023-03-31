@@ -1,8 +1,15 @@
-##!/usr/bin/env python
+#!/usr/bin/env python
+# *_* coding: utf-8 *_*
+
+"""brainfuck kernel class module"""
+
+import os
+import shutil
+import pexpect
 from ipykernel.kernelbase import Kernel
-import pexpect, os, shutil
 
 class jansbrainfuckkernel(Kernel):
+    """brainfuck kernel creates, com"""
     implementation = 'IPython'
     implementation_version = '8.11.0'
     language = 'brainfuck'
@@ -16,17 +23,17 @@ class jansbrainfuckkernel(Kernel):
 
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
-        if not silent:            
+        if not silent:
             workingdir = "/tmp/jansbrainfuckkernel/"
             if os.path.exists(workingdir):
                 shutil.rmtree(workingdir)
             os.mkdir(workingdir)
             os.chdir(workingdir)
-            with open(workingdir + "proj.bf", "w") as f:
-                    f.write(code)
+            with open(workingdir + "proj.bf", "w", encoding="UTF-8") as file:
+                file.write(code)
             os.system('bfc ' + workingdir  + 'proj.bf')
             if os.path.exists(workingdir + 'a.out'):
-                solution = pexpect.run(workingdir + 'a.out').decode('utf-8')
+                solution = pexpect.run(workingdir + 'a.out').decode('UTF-8')
             else:
                 solution = "Fuck your brain code did not compile."
             stream_content = {'name': 'stdout', 'text': solution}
@@ -37,7 +44,7 @@ class jansbrainfuckkernel(Kernel):
                 'payload': [],
                 'user_expressions': {},
                }
-    
+
     def do_shutdown(self, restart):
         workingdir = "/tmp/jansbrainfuckkernel/"
         shutil.rmtree(workingdir)
