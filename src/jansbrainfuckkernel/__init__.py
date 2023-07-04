@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # *_* coding: utf-8 *_*
 
-"""brainfuck kernel init"""
+"""Init module"""
 
-__version__ = "0.0.1"
+from importlib.metadata import version
+__version__ = version(__package__)

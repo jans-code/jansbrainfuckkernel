@@ -8,6 +8,8 @@ import shutil
 import pexpect
 from ipykernel.kernelbase import Kernel
 
+workingdir = "/tmp/jansbrainfuckkernel/"
+
 class jansbrainfuckkernel(Kernel):
     """brainfuck kernel creates, com"""
     implementation = 'IPython'
@@ -23,8 +25,7 @@ class jansbrainfuckkernel(Kernel):
 
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
-        if not silent:
-            workingdir = "/tmp/jansbrainfuckkernel/"
+        if not silent:          
             if os.path.exists(workingdir):
                 shutil.rmtree(workingdir)
             os.mkdir(workingdir)
@@ -46,5 +47,5 @@ class jansbrainfuckkernel(Kernel):
                }
 
     def do_shutdown(self, restart):
-        workingdir = "/tmp/jansbrainfuckkernel/"
-        shutil.rmtree(workingdir)
+        if os.path.exists(workingdir):
+            shutil.rmtree(workingdir)
