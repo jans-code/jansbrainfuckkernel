@@ -1,13 +1,16 @@
 # jansbrainfuckkernel
 
-![Logo](jansbrainfuckkernel/logo-svg.svg)
+![Logo](https://raw.githubusercontent.com/jans-code/jansbrainfuckkernel/main/jansbrainfuckkernel/logo-svg.svg)
 
 A jupyter kernel implementation of [brainfuck](https://github.com/benjamin-james/brainfuck).
 
+## Installation
+
+- `pip install jansbrainfuckkernel`
+- to register the kernel with jupyter `jansbrainfuckkernel`
 
 ## Dev Installation
 
-- install brainfuck (make sure you can run bfc from command line)
 - download/clone this project
 - open shell in project folder
 - `pip install -e ./`

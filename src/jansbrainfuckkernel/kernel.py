@@ -3,49 +3,86 @@
 
 """brainfuck kernel class module"""
 
-import os
-import shutil
-import pexpect
 from ipykernel.kernelbase import Kernel
 
-workingdir = "/tmp/jansbrainfuckkernel/"
 
 class jansbrainfuckkernel(Kernel):
-    """brainfuck kernel creates, com"""
-    implementation = 'IPython'
-    implementation_version = '8.11.0'
-    language = 'brainfuck'
-    language_version = '0.1'
+    """brainfuck kernel"""
+
+    implementation = "IPython"
+    implementation_version = "8.11.0"
+    language = "brainfuck"
+    language_version = "0.1"
     language_info = {
-        'name': 'brainfuck',
-        'mimetype': 'application/brainfuck',
-        'file_extension': '.bf',
+        "name": "brainfuck",
+        "mimetype": "application/brainfuck",
+        "file_extension": ".bf",
     }
     banner = "Brainfuck kernel"
+    _allow_stdin = True
 
-    def do_execute(self, code, silent, store_history=True, user_expressions=None,
-                   allow_stdin=False):
-        if not silent:          
-            if os.path.exists(workingdir):
-                shutil.rmtree(workingdir)
-            os.mkdir(workingdir)
-            os.chdir(workingdir)
-            with open(workingdir + "proj.bf", "w", encoding="UTF-8") as file:
-                file.write(code)
-            os.system('bfc ' + workingdir  + 'proj.bf')
-            if os.path.exists(workingdir + 'a.out'):
-                solution = pexpect.run(workingdir + 'a.out').decode('UTF-8')
-            else:
-                solution = "Fuck your brain code did not compile."
-            stream_content = {'name': 'stdout', 'text': solution}
-            self.send_response(self.iopub_socket, 'stream', stream_content)
+    def do_execute(
+        self, code, silent, store_history=True, user_expressions=None, allow_stdin=True
+    ):
+        if not silent:
+            solution = ""
+            bf_chars = ["+", "-", "<", ">", ".", ",", "[", "]"]
+            bf_arr = [0]
+            ci = 0
+            loop_table = {}
+            loop_stack = []
+            user_input = []
 
-        return {'status': 'ok',
-                'execution_count': self.execution_count,
-                'payload': [],
-                'user_expressions': {},
-               }
+            for i, cmd in enumerate(code):
+                match cmd:
+                    case "[":
+                        loop_stack.append(i)
+                    case "]":
+                        loop_begin = loop_stack.pop()
+                        loop_table[loop_begin] = i
+                        loop_table[i] = loop_begin
 
-    def do_shutdown(self, restart):
-        if os.path.exists(workingdir):
-            shutil.rmtree(workingdir)
+            i = 0
+            while i < len(code):
+                cmd = code[i]
+
+                if cmd in bf_chars:
+                    match cmd:
+                        case "+":
+                            bf_arr[ci] += 1
+                            if bf_arr[ci] == 256:
+                                bf_arr[ci] = 0
+                        case "-":
+                            bf_arr[ci] -= 1
+                            if bf_arr[ci] == -1:
+                                bf_arr[ci] = 255
+                        case "<":
+                            ci -= 1
+                        case ">":
+                            ci += 1
+                            if ci == len(bf_arr):
+                                bf_arr.append(0)
+                        case ".":
+                            solution += chr(bf_arr[ci])
+                        case ",":
+                            if user_input == []:
+                                user_input = list(self.raw_input())
+                            bf_arr[ci] = ord(user_input.pop(0))
+                        case "[":
+                            if bf_arr[ci] == 0:
+                                i = loop_table[i]
+                        case "]":
+                            if bf_arr[ci]:
+                                i = loop_table[i]
+
+                i += 1
+
+            stream_content = {"name": "stdout", "text": solution}
+            self.send_response(self.iopub_socket, "stream", stream_content)
+
+        return {
+            "status": "ok",
+            "execution_count": self.execution_count,
+            "payload": [],
+            "user_expressions": {},
+        }
